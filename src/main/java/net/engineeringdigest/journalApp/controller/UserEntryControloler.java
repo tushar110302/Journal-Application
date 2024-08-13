@@ -1,6 +1,8 @@
 package net.engineeringdigest.journalApp.controller;
 
+import net.engineeringdigest.journalApp.api.response.QuoteResponse;
 import net.engineeringdigest.journalApp.entity.UserEntity;
+import net.engineeringdigest.journalApp.service.QouteService;
 import net.engineeringdigest.journalApp.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public class UserEntryControloler {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private QouteService qouteService;
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody UserEntity newUser){
@@ -35,5 +39,17 @@ public class UserEntryControloler {
         String username = authentication.getName();
         userService.deleteByUsername(username);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> greet(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        return new ResponseEntity<>("HI, "+authentication.getName() , HttpStatus.OK  );
+        String qoutes = "";
+        QuoteResponse qoute = qouteService.getQoute();
+        if(qoute!=null){
+            qoutes = qoute.getFullData().getData().get(0).getContent();
+        }
+        return new ResponseEntity<>("HI, "+authentication.getName() + " , " + qoutes, HttpStatus.OK  );
     }
 }
